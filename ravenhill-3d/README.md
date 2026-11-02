@@ -12,10 +12,10 @@ Open `ravenhill-3d/index.html` through GitHub Pages or a local HTTP server. Inte
 
 ## Features
 - First-person 3D hotel with lobby, kitchen, office, security, records.
-- Seven inspectable evidence points, shared evidence notebook, 3 AP per turn.
+- Seven inspectable evidence points, three interviewable NPCs, shared evidence notebook and timeline, 3 AP per turn.
 - Separate player positions, mobile touch controls, basic collisions.
 - Local save / reload in the same browser via localStorage.
-- Preliminary accusation flow for Case 001.
+- Accusation unlocked only after key forensic evidence and a follow-up interview with Mira. The mystery remains a prototype, not a fully proved locked-room solution.
 
 ## Limitations
 - Primitive 3D meshes, **not photorealistic art**. No GLB/PBR asset pack yet.
