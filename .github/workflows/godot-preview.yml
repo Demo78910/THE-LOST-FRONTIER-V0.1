@@ -1,0 +1,49 @@
+name: Godot mobile web preview
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'godot/**'
+      - '.github/workflows/godot-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.4.1 and web templates
+        run: |
+          set -e
+          wget -q https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q Godot_v4.4.1-stable_linux.x86_64.zip
+          chmod +x Godot_v4.4.1-stable_linux.x86_64
+          sudo mv Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          wget -q https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
+          unzip -q Godot_v4.4.1-stable_export_templates.tpz
+          cp -r templates/. ~/.local/share/godot/export_templates/4.4.1.stable/
+      - name: Import resources and validate scripts
+        run: |
+          godot --headless --path godot --editor --import --quit
+          godot --headless --path godot --quit-after 5
+      - name: Export Web
+        run: |
+          mkdir -p godot-preview
+          godot --headless --path godot --export-release Web ../godot-preview/index.html
+          touch godot-preview/.nojekyll
+      - name: Upload playable build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: realm-of-fortune-godot-web
+          path: godot-preview/
+      - name: Publish preview into existing GitHub Pages folder
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f godot-preview/
+          if ! git diff --cached --quiet; then
+            git commit -m "build: publish Godot preview [skip ci]"
+            git push
+          fi
