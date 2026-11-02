@@ -73,6 +73,7 @@ func _build_ui() -> void:
 	hud.add_child(column)
 	stats = _label("", 17, Color("#f7e7c6"))
 	stats.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(stats)
 	message = _label("", 15, Color("#d6e4e6"))
 	message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -80,9 +81,9 @@ func _build_ui() -> void:
 	column.add_child(message)
 	var buttons := HBoxContainer.new()
 	column.add_child(buttons)
-	primary = _button("🎲 ทอยเต๋า", buttons, _primary_action)
-	secondary = _button("🧭 ทางเลือก", buttons, _secondary_action)
-	utility = _button("🧪 ใช้ยา", buttons, _use_potion)
+	primary = _button("ทอยเต๋า", buttons, _primary_action)
+	secondary = _button("เลือกเส้นทาง", buttons, _secondary_action)
+	utility = _button("ใช้ยา", buttons, _use_potion)
 	var footer := _label("REALM OF FORTUNE • MOBILE", 12, Color("#91b0b3"))
 	footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	root.add_child(footer)
@@ -97,7 +98,8 @@ func _label(value: String, font_size: int, color: Color) -> Label:
 func _button(value: String, parent: Node, callback: Callable) -> Button:
 	var button := Button.new()
 	button.text = value
-	button.custom_minimum_size = Vector2(0, 54)
+	button.custom_minimum_size = Vector2(0, 64)
+	button.add_theme_font_size_override("font_size", 17)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.pressed.connect(callback)
 	parent.add_child(button)
@@ -163,11 +165,11 @@ func _refresh() -> void:
 		return
 	var p: Dictionary = players[current]
 	header.text = "REALM OF FORTUNE     •     รอบ %d" % round_no
-	stats.text = "%s (%s)   ❤️ %d/%d   ⚔️ %d   🛡️ %d   🪙 %d   🏆 %d/3" % [p.name, HEROES[p["class"]].name, p.hp, p.max_hp, p.atk, p.def, p.gold, p.relics]
+	stats.text = "%s (%s)  |  HP %d/%d  |  ATK %d  DEF %d\nทอง %d  |  โบราณวัตถุ %d/3" % [p.name, HEROES[p["class"]].name, p.hp, p.max_hp, p.atk, p.def, p.gold, p.relics]
 	message.text = info
-	primary.text = "🎲 ทอยเต๋า" if phase == "roll" else ("➡️ เดินทางรอบนอก" if phase == "choice" else "⏭️ จบเทิร์น")
-	secondary.text = "🧭 ทางลัด" if phase == "choice" else "📜 เป้าหมาย"
-	utility.text = "🧪 ยา (%d)" % p.potions
+	primary.text = "ทอยเต๋า" if phase == "roll" else ("เดินทางรอบนอก" if phase == "choice" else "จบเทิร์น")
+	secondary.text = "ทางลัด" if phase == "choice" else "เป้าหมาย"
+	utility.text = "ยา (%d)" % p.potions
 	utility.disabled = p.potions <= 0 or p.hp >= p.max_hp
 	board.queue_redraw()
 
@@ -241,7 +243,7 @@ func _move(shortcut: bool) -> void:
 		result += " • กลับจุดเริ่มต้น"
 	if p.relics >= 3:
 		phase = "won"
-		info = "%s ชนะเกม! 🏆" % p.name
+		info = "%s ชนะเกม!" % p.name
 	else:
 		phase = "done"
 		info = "ช่อง %d • %s • %s" % [p.pos + 1, LABELS[kind], result]
@@ -271,36 +273,67 @@ func _use_potion() -> void:
 func _draw_board() -> void:
 	if players.is_empty():
 		return
-	var w := board.size.x
-	var h := board.size.y
-	var center := Vector2(w * 0.5, h * 0.52)
-	var rx := maxf(100, w * 0.39)
-	var ry := maxf(90, h * 0.39)
-	# A lightweight layered diorama illustration drawn by the engine.
-	board.draw_rect(Rect2(Vector2.ZERO, board.size), Color("#183e4a"))
-	board.draw_circle(center, minf(rx, ry) * 0.92, Color("#356f63"))
-	board.draw_circle(center + Vector2(-rx * 0.52, -ry * 0.3), minf(rx, ry) * 0.43, Color("#527c5e"))
-	board.draw_circle(center + Vector2(rx * 0.54, ry * 0.15), minf(rx, ry) * 0.34, Color("#b89b63"))
-	board.draw_circle(center + Vector2(rx * 0.3, -ry * 0.4), minf(rx, ry) * 0.27, Color("#8e9eb3"))
+	var w: float = board.size.x
+	var h: float = board.size.y
+	var center := Vector2(w * 0.5, h * 0.50)
+	var rx: float = maxf(100.0, w * 0.40)
+	var ry: float = maxf(100.0, h * 0.41)
+	board.draw_rect(Rect2(Vector2.ZERO, board.size), Color("#10252f"))
+	# A layered fantasy island: water, shoreline, hills, forest and ruins.
+	board.draw_circle(center + Vector2(0, 16), minf(rx, ry) * 1.03, Color("#0c1b25"))
+	board.draw_circle(center, minf(rx, ry) * 0.96, Color("#a98e60"))
+	board.draw_circle(center, minf(rx, ry) * 0.91, Color("#3d725e"))
+	board.draw_circle(center + Vector2(-rx * 0.34, -ry * 0.20), minf(rx, ry) * 0.38, Color("#567f56"))
+	board.draw_circle(center + Vector2(rx * 0.35, ry * 0.24), minf(rx, ry) * 0.29, Color("#c3a46d"))
+	board.draw_circle(center + Vector2(rx * 0.30, -ry * 0.34), minf(rx, ry) * 0.26, Color("#7e93a1"))
+	board.draw_circle(center + Vector2(rx * 0.30, -ry * 0.39), minf(rx, ry) * 0.19, Color("#b9c4c6"))
+	# Decorative forest clusters, drawn as individual trees rather than flat patches.
+	for i in range(32):
+		var a: float = float(i) * 2.39996
+		var rad: float = 0.16 + float(i % 6) * 0.11
+		var tree := center + Vector2(cos(a) * rx * rad, sin(a) * ry * rad)
+		if tree.distance_to(center + Vector2(rx * 0.3, -ry * 0.34)) < rx * 0.27:
+			continue
+		board.draw_circle(tree + Vector2(1, 4), 7, Color("#213d35"))
+		board.draw_circle(tree, 7, Color("#2a6048"))
+		board.draw_circle(tree + Vector2(-2, -2), 4, Color("#6c9a68"))
+	# Central stone citadel with a warm roof.
+	var castle := center + Vector2(-rx * 0.08, ry * 0.04)
+	board.draw_rect(Rect2(castle + Vector2(-20, -8), Vector2(40, 31)), Color("#263e47"))
+	board.draw_rect(Rect2(castle + Vector2(-16, -13), Vector2(32, 30)), Color("#c3b59b"))
+	board.draw_colored_polygon(PackedVector2Array([castle + Vector2(-24, -13), castle + Vector2(0, -31), castle + Vector2(24, -13)]), Color("#9e614c"))
+	board.draw_rect(Rect2(castle + Vector2(-5, 0), Vector2(10, 17)), Color("#5a493b"))
+	for side in [-1, 1]:
+		var tower := castle + Vector2(float(side) * 25, -5)
+		board.draw_rect(Rect2(tower + Vector2(-7, -17), Vector2(14, 31)), Color("#a8a79b"))
+		board.draw_colored_polygon(PackedVector2Array([tower + Vector2(-10, -17), tower + Vector2(0, -31), tower + Vector2(10, -17)]), Color("#874d48"))
+	# Carved tabletop path with a dark outline and brass rim.
 	var points: Array[Vector2] = []
 	for i in range(TILE_COUNT):
-		var angle := -PI / 2.0 + TAU * float(i) / TILE_COUNT
+		var angle: float = -PI / 2.0 + TAU * float(i) / float(TILE_COUNT)
 		points.append(center + Vector2(cos(angle) * rx, sin(angle) * ry))
 	for i in range(TILE_COUNT):
-		board.draw_line(points[i], points[(i + 1) % TILE_COUNT], Color("#d7b97c"), 12, true)
-		board.draw_line(points[i], points[(i + 1) % TILE_COUNT], Color("#75573b"), 3, true)
+		var next: int = (i + 1) % TILE_COUNT
+		board.draw_line(points[i], points[next], Color("#152b32"), 20, true)
+		board.draw_line(points[i], points[next], Color("#c7a46d"), 14, true)
+		board.draw_line(points[i], points[next], Color("#f4d99c"), 4, true)
 	for i in range(TILE_COUNT):
 		var kind: String = TYPES[i % TYPES.size()]
-		board.draw_circle(points[i] + Vector2(2, 4), 14, Color("#14252d"))
-		board.draw_circle(points[i], 13, COLORS[kind])
-		board.draw_arc(points[i], 13, 0, TAU, 20, Color("#f7e8bc"), 2, true)
+		var pos: Vector2 = points[i]
+		board.draw_circle(pos + Vector2(2, 4), 17, Color("#0a1b22"))
+		board.draw_circle(pos, 16, Color("#f5dca6"))
+		board.draw_circle(pos, 12, COLORS[kind])
+		board.draw_circle(pos + Vector2(-3, -4), 4, Color(1, 1, 1, 0.22))
+		if kind == "boss":
+			board.draw_arc(pos, 17, 0, TAU, 24, Color("#e5b6f3"), 3, true)
 	for i in range(players.size()):
 		var p: Dictionary = players[i]
-		var point: Vector2 = points[int(p.pos)] + Vector2((i % 3 - 1) * 11, -21 - int(i / 3) * 11)
-		board.draw_circle(point + Vector2(2, 3), 10, Color("#10232a"))
-		board.draw_circle(point, 9, Color.from_hsv(float(i) / maxf(2, players.size()), 0.6, 1.0))
+		var pos: Vector2 = points[int(p.pos)] + Vector2(float(i % 3 - 1) * 12, -24 - float(int(i / 3)) * 12)
+		board.draw_circle(pos + Vector2(2, 5), 11, Color("#101e27"))
+		board.draw_circle(pos, 10, Color.from_hsv(float(i) / maxf(2.0, float(players.size())), 0.64, 0.95))
+		board.draw_circle(pos + Vector2(-3, -3), 3, Color("#fff0d2"))
 		if i == current:
-			board.draw_arc(point, 12, 0, TAU, 24, Color("#fff2b7"), 3, true)
+			board.draw_arc(pos, 14, 0, TAU, 24, Color("#fff1a8"), 3, true)
 
 func _save_game() -> void:
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
