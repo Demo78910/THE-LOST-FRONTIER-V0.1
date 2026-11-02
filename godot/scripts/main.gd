@@ -34,6 +34,7 @@ var player_count := 2
 var selected_classes: Array = []
 
 func _ready() -> void:
+	print("REALM BOOT: Godot main scene initialized")
 	rng.randomize()
 	_build_ui()
 	if not _load_game():
@@ -42,6 +43,7 @@ func _ready() -> void:
 		_refresh()
 
 func _build_ui() -> void:
+	print("REALM BOOT: building UI")
 	var background := ColorRect.new()
 	background.color = Color("#10222d")
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -96,15 +98,17 @@ func _button(value: String, parent: Node, callback: Callable) -> Button:
 	return button
 
 func _show_setup() -> void:
+	print("REALM BOOT: setup screen")
 	if is_instance_valid(start_layer):
 		start_layer.queue_free()
 	start_layer = PanelContainer.new()
-	start_layer.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	start_layer.custom_minimum_size = Vector2(360, 280)
-	start_layer.position = Vector2(30, 65)
+	start_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	start_layer.custom_minimum_size = Vector2.ZERO
+	start_layer.position = Vector2.ZERO
 	add_child(start_layer)
 	var column := VBoxContainer.new()
 	start_layer.add_child(column)
+	column.alignment = BoxContainer.ALIGNMENT_CENTER
 	column.add_child(_label("เริ่มเกมใหม่ • เลือกจำนวนผู้เล่น", 21, Color("#f8dda5")))
 	var count := OptionButton.new()
 	for i in range(2, 7):
