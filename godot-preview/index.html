@@ -111,7 +111,7 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":13392,"index.wasm":43699190},"focusCanvas":true,"gdextensionLibs":[]};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":13600,"index.wasm":43699190},"focusCanvas":true,"gdextensionLibs":[]};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
@@ -215,6 +215,6 @@ const engine = new Engine(GODOT_CONFIG);
 	}
 }());
 		</script>
-	</body>
+	<div id="realm-debug" style="position:fixed;bottom:10px;left:10px;right:10px;z-index:9999;background:#152a37;color:#ffe1a0;padding:12px;border:1px solid #b98d50;border-radius:10px;font:14px sans-serif;display:none"></div><script>window.addEventListener("error",function(e){var d=document.getElementById("realm-debug");if(d){d.style.display="block";d.textContent="REALM ERROR: "+e.message}});window.addEventListener("unhandledrejection",function(e){var d=document.getElementById("realm-debug");if(d){d.style.display="block";d.textContent="REALM ERROR: "+String(e.reason)}});</script></body>
 </html>
 
