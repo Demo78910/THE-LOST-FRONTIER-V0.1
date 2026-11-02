@@ -31,6 +31,26 @@ jobs:
           if grep -E "SCRIPT ERROR|Parse Error|Failed to load script" /tmp/realm-import.log /tmp/realm-run.log; then
             echo "Godot script errors detected"; exit 1
           fi
+      - name: Publish validation diagnostics on failure
+        if: failure()
+        run: |
+          {
+            echo "# Godot validation diagnostics"
+            echo "Commit: $GITHUB_SHA"
+            echo "Run: $GITHUB_RUN_ID"
+            echo
+            echo "## Import"
+            cat /tmp/realm-import.log 2>/dev/null || true
+            echo
+            echo "## Runtime"
+            cat /tmp/realm-run.log 2>/dev/null || true
+          } > godot-diagnostics.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add godot-diagnostics.txt
+          git commit -m "ci: capture Godot validation errors [skip ci]" || true
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
       - name: Export Web
         run: |
           mkdir -p godot-preview
