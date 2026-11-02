@@ -36,7 +36,7 @@ var selected_classes: Array = []
 func _ready() -> void:
 	print("REALM BOOT: Godot main scene initialized")
 	rng.randomize()
-	var thai_font := load("res://assets/fonts/Sarabun-Regular.ttf") as Font
+	var thai_font: Font = preload("res://assets/fonts/Sarabun-Regular.ttf")
 	if thai_font:
 		var mobile_theme := Theme.new()
 		mobile_theme.default_font = thai_font
