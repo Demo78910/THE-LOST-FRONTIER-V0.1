@@ -24,6 +24,11 @@ jobs:
           mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
           unzip -q Godot_v4.4.1-stable_export_templates.tpz
           cp -r templates/. ~/.local/share/godot/export_templates/4.4.1.stable/
+      - name: Install Thai UI font
+        run: |
+          mkdir -p godot/assets/fonts
+          curl -fL --retry 3 -o godot/assets/fonts/Sarabun-Regular.ttf https://raw.githubusercontent.com/google/fonts/main/ofl/sarabun/Sarabun-Regular.ttf
+          test -s godot/assets/fonts/Sarabun-Regular.ttf
       - name: Import resources and validate scripts
         run: |
           godot --headless --path godot --editor --import --quit 2>&1 | tee /tmp/realm-import.log
