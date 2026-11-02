@@ -36,6 +36,12 @@ var selected_classes: Array = []
 func _ready() -> void:
 	print("REALM BOOT: Godot main scene initialized")
 	rng.randomize()
+	var thai_font := load("res://assets/fonts/Sarabun-Regular.ttf") as Font
+	if thai_font:
+		var mobile_theme := Theme.new()
+		mobile_theme.default_font = thai_font
+		mobile_theme.default_font_size = 20
+		theme = mobile_theme
 	_build_ui()
 	if not _load_game():
 		_show_setup()
@@ -52,12 +58,12 @@ func _build_ui() -> void:
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.add_theme_constant_override("separation", 4)
 	add_child(root)
-	header = _label("REALM OF FORTUNE   •   FANTASY TABLETOP", 23, Color("#f8dda5"))
+	header = _label("REALM OF FORTUNE", 23, Color("#f8dda5"))
 	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	root.add_child(header)
 	board = Control.new()
 	board.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	board.custom_minimum_size = Vector2(0, 280)
+	board.custom_minimum_size = Vector2(0, 330)
 	board.draw.connect(_draw_board)
 	root.add_child(board)
 	var hud := PanelContainer.new()
@@ -77,7 +83,7 @@ func _build_ui() -> void:
 	primary = _button("🎲 ทอยเต๋า", buttons, _primary_action)
 	secondary = _button("🧭 ทางเลือก", buttons, _secondary_action)
 	utility = _button("🧪 ใช้ยา", buttons, _use_potion)
-	var footer := _label("REALM OF FORTUNE • GODOT MOBILE PROTOTYPE", 11, Color("#91b0b3"))
+	var footer := _label("REALM OF FORTUNE • MOBILE", 12, Color("#91b0b3"))
 	footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	root.add_child(footer)
 
@@ -116,7 +122,7 @@ func _show_setup() -> void:
 	count.select(player_count - 2)
 	count.item_selected.connect(func(index: int) -> void: player_count = index + 2)
 	column.add_child(count)
-	column.add_child(_label("ผู้เล่นแต่ละคนเลือกอาชีพในขั้นตอนถัดไป", 15, Color("#d6e4e6")))
+	column.add_child(_label("เลือกอาชีพให้ผู้เล่นทีละคน", 17, Color("#d6e4e6")))
 	var go := _button("เริ่มเลือกตัวละคร", column, _choose_next)
 	go.custom_minimum_size.y = 65
 
