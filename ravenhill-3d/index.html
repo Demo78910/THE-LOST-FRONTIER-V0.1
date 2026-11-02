@@ -21,6 +21,34 @@ cube(7.6,.7,-4.7,3.8,1.4,1.5,wood,true);cube(7.6,1.45,-4.7,4,.16,1.7,trim);cube(
 cyl(7,1.68,-4.4,.12,.28,glass);cyl(7,1.58,-4.4,.095,.04,red);cube(8.1,1.59,-4.4,.6,.025,.4,paper);cyl(10.1,1.7,-8.7,.32,.1,gold);
 // Security and records
 cube(-7.7,.75,5.3,3.5,1.5,1.2,dark,true);cube(-7.7,1.55,5.3,1.3,.65,.08,glass);cube(7.5,.65,5.6,3.3,1.3,1.1,wood,true);for(let i=0;i<4;i++)cube(6.3+i*.75,1.4,5.6,.25,.5,.7,red);
+
+/* V0.3: richer navigable 3D hotel blockout — procedural detail, no external image dependency */
+const marble=material(0x92989a,.25),brass=material(0xbda36e,.3,.65),fabric=material(0x425866,.95),leaf=material(0x3c654b),stone=material(0x49535c),lightShade=material(0xffe1ac);
+function rug(x,z,w,d){cube(x,.018,z,w,.025,d,red);cube(x,.035,z,w-.23,.012,d-.23,gold);cube(x,.05,z,w-.42,.012,d-.42,fabric)}
+function picture(x,z,w=1.3){cube(x,1.75,z,w,1,.09,brass);cube(x,1.75,z+.06,w-.14,.85,.04,dark);cube(x,1.75,z+.085,w-.3,.55,.02,red)}
+function plant(x,z){cyl(x,.28,z,.32,.55,stone);cyl(x,.72,z,.06,.5,wood);for(let i=0;i<7;i++){const a=i*Math.PI*2/7;const o=new T.Mesh(new T.SphereGeometry(.25,8,6),leaf);o.position.set(x+Math.cos(a)*.22,1.04+(i%3)*.11,z+Math.sin(a)*.22);o.scale.set(.75,1.7,.65);scene.add(o)}}
+function seat(x,z){cube(x,.27,z,1.15,.52,.85,wood,true);cube(x,.69,z+.33,1.15,.9,.19,fabric);cube(x,.55,z,1,.15,.72,fabric)}
+function column(x,z){cube(x,1.6,z,.4,3.2,.4,marble,true);cube(x,3.05,z,.65,.22,.65,brass);cube(x,.2,z,.65,.25,.65,brass)}
+function hangingLight(x,z){cyl(x,2.9,z,.035,.55,brass);cyl(x,2.53,z,.28,.3,lightShade);const l=new T.PointLight(0xffd6a0,3.5,5);l.position.set(x,2.42,z);scene.add(l)}
+// Decorative floor patterns and architectural rhythm
+for(let x=-10;x<=10;x+=2){cube(x,.009,-8.9,1.7,.012,.09,brass);cube(x,.009,8.9,1.7,.012,.09,brass)}
+for(const x of [-10.6,10.6])for(const z of [-8.3,-1.2,3.2,8.2])column(x,z);
+rug(-7, -3.5,3.5,3);rug(0,-3.7,3,3.3);rug(7,-4.5,4.4,3.5);rug(-7,4.7,3.6,3.3);
+seat(-9.1,-3.1);seat(-5.2,-3.1);seat(6.1,-2.4);
+for(const [x,z] of [[-10,-6.7],[-4.7,-6.9],[9.7,-6.5],[-10,6.7],[10,7.6],[-5,8.2]])plant(x,z);
+for(const [x,z] of [[-7,-6.7],[0,-6.7],[7,-6.7],[-7,7.6],[7,7.6]])hangingLight(x,z);
+// Front desk, hotel signage, shelving and reception props
+cube(-7.7,1.43,-5.5,2.3,.14,.18,marble);for(let i=0;i<3;i++)cube(-8.6+i*.8,1.5,-5.35,.32,.11,.32,brass);
+for(const z of [-8.5,-7.5,-6.5])cube(10.45,1.2,z,.25,.12,1.05,brass);
+for(let i=0;i<5;i++)cube(10.2,.5+i*.42,-8.2,.5,.08,1.1,brass);
+for(let i=0;i<3;i++)picture(6+i*1.1,-8.95,.85);
+for(let i=0;i<3;i++)picture(-9.6+i*1.4,8.95,.9);
+for(let i=0;i<5;i++)cube(-1.8+i*.8,.05,-8.1,.45,.08,.45,marble);
+cube(7.7,1.56,-4.75,2.4,.05,.55,marble);cube(7.4,1.61,-4.65,.9,.04,.45,dark);
+for(let i=0;i<4;i++)cube(6.6+i*.35,1.62,-4.5,.15,.04,.25,paper);
+// Visible navigational floor markers, independent of interface overlay
+for(const [x,z] of [[-3.1,-1.4],[3.2,-1.4],[-3.1,1.4],[3.2,1.4]]){cube(x,.015,z,.45,.025,.8,brass)}
+
 const cluesData=[
 {id:'register',name:'สมุดลงชื่อ',x:-7.5,z:-5.1,desc:'สมุดบันทึกผู้เข้าออกโรงแรม',analysis:'มีลายมือแก้เวลาการเข้าออกช่วง 23:00 น.',kind:'physical'},
 {id:'mug',name:'ถ้วยในห้องครัว',x:0,z:-4.1,desc:'ถ้วยที่พนักงานอ้างว่าใช้เตรียมเครื่องดื่ม',analysis:'ไม่พบสารชนิดเดียวกับในแก้วไวน์',kind:'physical'},
