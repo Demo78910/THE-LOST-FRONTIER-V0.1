@@ -141,7 +141,7 @@ func _choose_next() -> void:
 func _new_game() -> void:
 	players.clear()
 	for i in range(player_count):
-		var hero: Dictionary = HEROES[selected_classes[i]]
+		var hero: Dictionary = HEROES[int(selected_classes[i])]
 		players.append({"name":"ผู้เล่น %d" % (i + 1), "class":selected_classes[i], "hp":hero.hp, "max_hp":hero.hp, "atk":hero.atk, "def":hero.def, "pos":0, "gold":6, "potions":2, "relics":0})
 	current = 0
 	round_no = 1
@@ -194,7 +194,7 @@ func _move(shortcut: bool) -> void:
 	if shortcut:
 		move_by += 2
 	p.pos = (p.pos + move_by) % TILE_COUNT
-	var kind: String = TYPES[p.pos % TYPES.size()]
+	var kind: String = TYPES[int(p.pos) % TYPES.size()]
 	var result := ""
 	match kind:
 		"town":
@@ -218,14 +218,14 @@ func _move(shortcut: bool) -> void:
 		"battle", "boss":
 			var boss := kind == "boss"
 			var monster := rng.randi_range(3, 9) + (5 if boss else 0)
-			var attack := rng.randi_range(1, 6) + p.atk
+			var attack: int = rng.randi_range(1, 6) + int(p.atk)
 			if attack >= monster:
 				p.gold += 10 if boss else 4
 				if boss:
 					p.relics += 1
 				result = "ชนะ%s! โจมตี %d ต่อ %d" % ["บอส" if boss else "ศัตรู", attack, monster]
 			else:
-				var damage := maxi(1, monster - p.def - 2)
+				var damage: int = maxi(1, monster - int(p.def) - 2)
 				p.hp = maxi(0, p.hp - damage)
 				result = "พ่ายแพ้ เสีย %d HP" % damage
 	if p.hp <= 0:
@@ -290,7 +290,7 @@ func _draw_board() -> void:
 		board.draw_arc(points[i], 13, 0, TAU, 20, Color("#f7e8bc"), 2, true)
 	for i in range(players.size()):
 		var p: Dictionary = players[i]
-		var point := points[p.pos] + Vector2((i % 3 - 1) * 11, -21 - int(i / 3) * 11)
+		var point: Vector2 = points[int(p.pos)] + Vector2((i % 3 - 1) * 11, -21 - int(i / 3) * 11)
 		board.draw_circle(point + Vector2(2, 3), 10, Color("#10232a"))
 		board.draw_circle(point, 9, Color.from_hsv(float(i) / maxf(2, players.size()), 0.6, 1.0))
 		if i == current:
