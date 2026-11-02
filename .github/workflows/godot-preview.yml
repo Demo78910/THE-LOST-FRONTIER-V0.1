@@ -26,13 +26,23 @@ jobs:
           cp -r templates/. ~/.local/share/godot/export_templates/4.4.1.stable/
       - name: Import resources and validate scripts
         run: |
-          godot --headless --path godot --editor --import --quit
-          godot --headless --path godot --quit-after 5
+          godot --headless --path godot --editor --import --quit 2>&1 | tee /tmp/realm-import.log
+          godot --headless --path godot --quit-after 5 2>&1 | tee /tmp/realm-run.log
+          if grep -E "SCRIPT ERROR|Parse Error|Failed to load script" /tmp/realm-import.log /tmp/realm-run.log; then
+            echo "Godot script errors detected"; exit 1
+          fi
       - name: Export Web
         run: |
           mkdir -p godot-preview
           godot --headless --path godot --export-release Web ../godot-preview/index.html
           touch godot-preview/.nojekyll
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("godot-preview/index.html")
+          html=p.read_text()
+          overlay='<div id="realm-debug" style="position:fixed;bottom:10px;left:10px;right:10px;z-index:9999;background:#152a37;color:#ffe1a0;padding:12px;border:1px solid #b98d50;border-radius:10px;font:14px sans-serif;display:none"></div><script>window.addEventListener("error",function(e){var d=document.getElementById("realm-debug");if(d){d.style.display="block";d.textContent="REALM ERROR: "+e.message}});window.addEventListener("unhandledrejection",function(e){var d=document.getElementById("realm-debug");if(d){d.style.display="block";d.textContent="REALM ERROR: "+String(e.reason)}});</script>'
+          p.write_text(html.replace("</body>",overlay+"</body>"))
+          PY
       - name: Upload playable build artifact
         uses: actions/upload-artifact@v4
         with:
